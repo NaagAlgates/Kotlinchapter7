@@ -1,14 +1,22 @@
 import kotlin.jvm.internal.Intrinsics
+import kotlin.math.roundToInt
 
 const val TAVERN_NAME = "Taernyl's Folly"
+var playerGold = 10
+var playerSilver = 10
+var dragonBreathQuantity = 5.0
+val onePint=0.125
+val showPintCountThreshhold = 12
 fun main() {
+    displayRemaningDragonsBreath(0)
     placeOrder("shandy,DRAGON'S BREATH; IT'S GOT WHAT ADVENTURES CRAVE,5.91")
+    displayRemaningDragonsBreath(13)
 }
 fun placeOrder(menuData:String){
     try {
         val indexOfApostrophe = TAVERN_NAME.indexOf('\'')
-        var tavernMster = TAVERN_NAME.substring(0 until indexOfApostrophe)
-        println("Madrigal speaks with $tavernMster about their order")
+        val tavernMaster = TAVERN_NAME.substring(0 until indexOfApostrophe)
+        println("Madrigal speaks with $tavernMaster about their order")
         /*val data = menuData.split(",")
         val type = data[0]
         val name = data[1]
@@ -17,6 +25,7 @@ fun placeOrder(menuData:String){
         val message = "Madrigal buys a ${name.split(';')[0].toLowerCase().capitalize()} ($type) for $price"
         val phrase = "Ah, delicious $name"
         println(message)
+        performPurchase(price = price.toDouble())
         println(toDragonSpeak(phrase))
     }catch (e:Exception){
         println(e)
@@ -37,5 +46,28 @@ fun toDragonSpeak(phrase:String)=phrase.replace(Regex("[aAeEiIoOuU]")){
         "O"->"0"
         "U"->"|_|"
         else->it.value
+    }
+}
+fun performPurchase(price: Double){
+    displayBalance()
+    val totalPurse = playerGold+(playerSilver/100.0)
+    println("Total purse: $totalPurse")
+    println("Purchasing item for $price")
+    val remainingBalance=totalPurse-price
+    println("Remaning Balance: ${"%.2f".format(remainingBalance)}")
+    val remaningGold = remainingBalance.toInt()
+    val remainingSilver = (remainingBalance%1*100).roundToInt()
+    playerGold=remaningGold
+    playerSilver=remainingSilver
+    displayBalance()
+}
+private fun displayBalance(){
+    println("Player's purse balance: Gold: $playerGold, Silver $playerSilver")
+}
+private fun displayRemaningDragonsBreath(purchasedquantity:Int){
+    dragonBreathQuantity -= (purchasedquantity * onePint)
+    println("Remaining Breath (Gallons): $dragonBreathQuantity")
+    if(purchasedquantity>=showPintCountThreshhold){
+        println("Remaining Pints: ${(dragonBreathQuantity/onePint).roundToInt()}")
     }
 }
